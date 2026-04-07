@@ -1,0 +1,32 @@
+# VRX-64 umbrella workspace
+#
+# This is the compatibility manifest for the VRX-64 display engine.
+# Each commit to this repo pins the exact component versions (via submodule SHAs
+# and Cargo.lock) that are known to build and work together.
+#
+# For local development, clone with --recurse-submodules. The [patch] sections
+# below redirect the git deps in each component's Cargo.toml to the local
+# submodule checkouts, so you can edit any component and build immediately
+# without pushing first.
+
+[workspace]
+members = [
+    "VRX-64-slide",
+    "VRX-64-kernel",
+    "VRX-64-sidecar",
+    "VRX-64-native",
+    "VRX-64-web",
+]
+resolver = "2"
+
+# Redirect git deps to local submodule paths for development.
+# Without these patches, cargo would fetch from GitHub on every build.
+
+[patch."https://github.com/vzglyd/VRX-64-slide"]
+"VRX-64-slide" = { path = "VRX-64-slide" }
+
+[patch."https://github.com/vzglyd/VRX-64-kernel"]
+"VRX-64-kernel" = { path = "VRX-64-kernel" }
+
+[patch."https://github.com/vzglyd/VRX-64-sidecar"]
+"VRX-64-sidecar" = { path = "VRX-64-sidecar" }
