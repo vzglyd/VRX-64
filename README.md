@@ -97,7 +97,8 @@ complete ecosystem:
 *   **`VRX-64-web`**: A web-based host implementation that executes the engine
     within a WebGPU-enabled browser.
 *   **`VRX-64-slide`**: The specification and toolset for constructing the
-    visual components of a `vzglyd` bundle.
+    visual components of a `vzglyd` bundle, including audio playback support
+    for MP3, WAV, Ogg, and FLAC sound assets.
 *   **`VRX-64-sidecar`**: The specification and toolset for developing the
     logic and data-fetching components.
 
