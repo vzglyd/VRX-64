@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ "${VRX64_SKIP_SMOKE:-}" == "1" ]]; then
+  echo "[pre-commit] VRX64_SKIP_SMOKE=1; skipping smoke"
+  exit 0
+fi
+
+exec scripts/smoke.sh
