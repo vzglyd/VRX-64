@@ -30,3 +30,11 @@ resolver = "2"
 
 [patch."https://github.com/vzglyd/VRX-64-sidecar"]
 "VRX-64-sidecar" = { path = "VRX-64-sidecar" }
+
+# Reduce build artifact sizes to save disk space
+[profile.dev]
+debug = 0          # Skip debug info in dev builds (saves ~70% space)
+incremental = false # Disable incremental compilation (saves space)
+
+[profile.release]
+strip = true       # Strip symbols from release binaries
