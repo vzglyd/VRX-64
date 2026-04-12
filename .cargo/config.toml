@@ -1,0 +1,53 @@
+# Cargo configuration for disk-space-efficient builds
+# See: https://doc.rust-lang.org/cargo/reference/config.html
+
+[build]
+# Disable incremental compilation to save significant disk space
+# Incremental compilation can 2-3x the target directory size
+incremental = false
+
+[target.'cfg(all())']
+# Use thin LTO for release builds - better optimization with less overhead than fat LTO
+rustflags = []
+
+[profile.dev]
+# Keep debug info for development but use a more compact format
+debug = "line-tables-only"
+# Optimize for smaller binary size
+opt-level = 0
+# Strip debuginfo from binaries (not from debug info files)
+strip = "none"
+
+[profile.release]
+# Enable LTO for smaller, optimized binaries
+lto = "thin"
+# Optimize for binary size
+opt-level = "z"
+# Strip all symbols and debug info from release binaries
+strip = true
+# Reduce parallel codegen units for better optimization
+codegen-units = 1
+# Keep debug info if needed for profiling (set to false to skip)
+debug = false
+
+[profile.release-small]
+# Custom profile for minimal binary size
+inherits = "release"
+# Maximum size optimization
+opt-level = "z"
+# Enable full LTO for smallest size (slower build but smaller binary)
+lto = "fat"
+# Strip everything
+strip = true
+# Single codegen unit for optimal optimization
+codegen-units = 1
+# Abort on panic for smaller binaries (no panic unwinding code)
+panic = "abort"
+
+[profile.dev-fast]
+# Custom profile for fastest builds during development
+inherits = "dev"
+# No incremental compilation (already disabled globally)
+opt-level = 0
+# Minimal debug info
+debug = "line-tables-only"
