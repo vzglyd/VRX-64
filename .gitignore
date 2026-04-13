@@ -1,6 +1,10 @@
 # Rust build artifacts
 /target/
 
+# Node / Playwright artifacts
+/node_modules/
+/test-results/
+
 # IDE
 .vscode/
 .idea/
