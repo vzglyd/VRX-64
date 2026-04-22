@@ -13,9 +13,7 @@
 members = [
     "VRX-64-slide",
     "VRX-64-kernel",
-    "VRX-64-sidecar",
     "VRX-64-native",
-    "VRX-64-web",
 ]
 resolver = "2"
 
@@ -27,9 +25,6 @@ resolver = "2"
 
 [patch."https://github.com/vzglyd/VRX-64-kernel"]
 "VRX-64-kernel" = { path = "VRX-64-kernel" }
-
-[patch."https://github.com/vzglyd/VRX-64-sidecar"]
-"VRX-64-sidecar" = { path = "VRX-64-sidecar" }
 
 # Reduce build artifact sizes to save disk space
 [profile.dev]

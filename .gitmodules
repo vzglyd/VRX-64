@@ -4,12 +4,6 @@
 [submodule "VRX-64-kernel"]
 	path = VRX-64-kernel
 	url = https://github.com/vzglyd/VRX-64-kernel
-[submodule "VRX-64-sidecar"]
-	path = VRX-64-sidecar
-	url = https://github.com/vzglyd/VRX-64-sidecar
 [submodule "VRX-64-native"]
 	path = VRX-64-native
 	url = https://github.com/vzglyd/VRX-64-native
-[submodule "VRX-64-web"]
-	path = VRX-64-web
-	url = https://github.com/vzglyd/VRX-64-web

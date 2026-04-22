@@ -2,9 +2,8 @@
   "name": "vrx64-workspace",
   "private": true,
   "scripts": {
-    "build:ui": "npm run build:web-preview && npm run build:native-management",
-    "build:native-management": "vite build --config VRX-64-native/src/ui/vite.config.ts",
-    "build:web-preview": "vite build --config VRX-64-web/web-preview/vite.config.ts"
+    "build:ui": "npm run build:native-management",
+    "build:native-management": "vite build --config VRX-64-native/src/ui/vite.config.ts"
   },
   "devDependencies": {
     "@playwright/test": "^1.44.0",

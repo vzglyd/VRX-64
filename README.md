@@ -19,44 +19,33 @@ and leveraging the capabilities of **WebGPU**, the framework enables the
 necessary infrastructure to ensure that any WebGPU-compatible
 browser can serve a dashboard, while still performing better in a native application.
 
-## System Architecture: The `vzglyd` Bundle Format
+## System Architecture: Native-First Display Runtime
 
-The core of the VRX-64 architecture is the `vzglyd` bundle format, which
-implements a strict separation of concerns by decoupling visual presentation
-from data acquisition and processing.
+VRX-64 is now scoped to one job: render information quickly and reliably.
+Data acquisition is no longer part of the host runtime. Instead, an external
+tool such as [`brrmmmm`](../brrmmmm/README.md) writes JSON result files, and
+VRX-64 watches those files and forwards their bytes into the slide runtime.
 
-A `vzglyd` bundle is composed of two discrete, isolated components:
+The active contract is:
 
-1.  **The Slide (Visual Layer)**: This component is responsible for the
-    rendering of graphics, animations, and user interface elements. It utilizes
-    WebGPU to leverage hardware-accelerated rendering capabilities, ensuring
-    high-performance visual output.
-2.  **The Sidecar (Logic and Data Layer)**: This component manages the
-    lifecycle of data acquisition. It is responsible for fetching data from
-    various sources (e.g., APIs, sensors, databases), performing necessary
-    computations, and providing the processed data to the Slide component.
+1. **The Slide (`slide.wasm`)** renders visuals and reads host-provided bytes
+   through the existing `channel_poll` mailbox ABI.
+2. **The Host (`VRX-64-native`)** loads playlists and bundles, watches the
+   configured JSON files for updates, and delivers the latest valid payload to
+   the slide.
+3. **The Fetcher (`brrmmmm` or another external process)** owns networking,
+   retries, authentication, and persistence, then writes a durable result file
+   that VRX-64 can display.
 
-### Decoupling and Polyglot Execution
-
-The architectural isolation between the Slide and the Sidecar facilitates
-language agnostim. Because these components are decoupled, they can be
-implemented using entirely different programming languages. A Sidecar may be
-implemented as a **WebAssembly (Wasm)** module written in Rust, C++, or Python
-(via specialized runtimes), while the Slide can utilize JavaScript or Wasm to
-interface with the WebGPU API.
-
-This isolation provides significant robustness: a failure in the data-fetching
-logic (the Sidecar) does not compromise the stability of the visual
-presentation (the Slide). Furthermore, this decoupling allows developers to
-select the most efficient tool for each specific computational or rendering
-task.
+This keeps acquisition failures and display failures in separate processes while
+letting one business-logic producer feed many display implementations.
 
 ## Foundational Technologies: WebAssembly and WebGPU
 
 The VRX-64 framework is built upon the pillars of modern web standards:
 
-*   **WebGPU**: Provides the foundational capability for high-performance, low-overhead graphics. By leveraging the modern GPU pipeline, VRX-64 achieves near-native rendering performance within the browser environment. This is critical for maintaining high-frame-rate animations and complex visual effects even on resource-constrained hardware like the Raspberry Pi 4.
-*   **WebAssembly (Wasm)**: Enables high-performance computation within the browser ecosystem. Wasm allows for the integration of diverse, high-performance languages, providing the computational power required for the Sidecar to perform complex data processing, parsing, and state management, while allowing the Slide to focus on rendering logic.
+*   **WebGPU**: Provides the foundational capability for high-performance, low-overhead graphics. By leveraging the modern GPU pipeline, VRX-64 achieves native-grade rendering on modest hardware such as the Raspberry Pi 4.
+*   **WebAssembly (Wasm)**: Powers portable slide runtimes so rendering logic stays reusable while the host remains focused on lifecycle, file watching, and GPU execution.
 
 ## Repository Structure
 
@@ -64,48 +53,47 @@ The VRX-64 framework is built upon the pillars of modern web standards:
 graph TD
     subgraph "Host Implementations"
         Native[VRX-64-native]
-        Web[VRX-64-web]
     end
 
     subgraph "Core Engine"
         Kernel[VRX-64-kernel]
     end
 
-    subgraph "Bundle Specification"
+    subgraph "Bundle Runtime"
         Slide[VRX-64-slide]
-        Sidecar[VRX-64-sidecar]
+    end
+
+    subgraph "Data Acquisition"
+        Brrmmmm[brrmmmm]
+        ResultFile[result .out.json]
     end
 
     Native -->|Embeds| Kernel
-    Web -->|Embeds| Kernel
     Kernel -->|Loads| Slide
-    Kernel -->|Executes| Sidecar
     Slide -.->|Visual Output| Native
-    Slide -.->|Visual Output| Web
-    Sidecar -.->|Data Flow| Slide
+    Brrmmmm -->|Writes| ResultFile
+    ResultFile -->|Watched via data_path| Native
+    Native -->|Mailbox bytes| Slide
 ```
 
 The VRX-64 repository is organized into specialized modules that constitute the
 complete ecosystem:
 
 *   **`VRX-64-kernel`**: The platform-agnostic core of the display engine. It
-    manages slide scheduling, transition state machines, and shader validation.
-    It is designed for embedding within various host implementations.
+    manages slide scheduling, transition state machines, playlist metadata, and
+    shader validation.
 *   **`VRX-64-native`**: A native host implementation utilizing `wgpu` and
     `winit`, enabling the engine to operate as a standalone desktop
-    application.
-*   **`VRX-64-web`**: A web-based host implementation that executes the engine
-    within a WebGPU-enabled browser.
+    application that watches slide data files and updates immediately when they
+    change.
 *   **`VRX-64-slide`**: The specification and toolset for constructing the
     visual components of a `vzglyd` bundle, including audio playback support
     for MP3, WAV, Ogg, and FLAC sound assets.
-*   **`VRX-64-sidecar`**: The specification and toolset for developing the
-    logic and data-fetching components.
 
 ## Conclusion and Future Directions
 
 The architectural potential of VRX-64 remains largely unexplored. The framework
-is intentionally designed to be extensible, encouraging researchers and
-developers to experiment with new languages, data sources, and rendering
-techniques. The ultimate objective is to establish a platform for a new class
-of interactive, high-performance, and glanceable information displays.
+is intentionally designed to keep display concerns small and fast while letting
+other runtimes own acquisition. The objective is a platform for high-performance,
+glanceable information displays that can consume durable result files from many
+different upstream tools.
