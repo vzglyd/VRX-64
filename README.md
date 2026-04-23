@@ -9,11 +9,26 @@ information displayed.
 
 ## Abstract: The Dashboard Operating System Paradigm
 
-The proliferation of digital notifications and the necessity of frequent check-ins on various information streams can be burdensome. A dedicated, persistent display or personalized dashboard offers a solution by providing a single, synchronized location for calendars, reminders, and critical metrics, facilitating serendipitous information consumption and reducing cognitive load.
+The proliferation of digital notifications and the necessity of frequent
+check-ins on various information streams can be burdensome. A dedicated,
+persistent display or personalized dashboard offers a solution by providing a
+single, synchronized location for calendars, reminders, and critical metrics,
+facilitating serendipitous information consumption and reducing cognitive load.
 
-Beyond personal use, a prevalent challenge in modern office environments is the use of web-based interfaces for large-scale, persistent monitoring. Typically, web pages designed for active user interaction (e.g., complex data dashboards or monitoring tools) are deployed on large-format wall monitors. In order to hedge against displaying the wrong information, more data and more graphs tend to be added to these dashboards until the text is too small to be read effectively as a dashboard.
+Beyond personal use, a prevalent challenge in modern office environments is the
+use of web-based interfaces for large-scale, persistent monitoring. Typically,
+web pages designed for active user interaction (e.g., complex data dashboards
+or monitoring tools) are deployed on large-format wall monitors. In order to
+hedge against displaying the wrong information, more data and more graphs tend
+to be added to these dashboards until the text is too small to be read
+effectively as a dashboard.
 
-VRX-64 asks: if user input and interactivity are removed as an expectation, and the principles of real-time rendering from the early 2000s are adopted, is it possible to present more compelling, beautiful dashboards that are actually utilized, rather than just providing a false sense of security through visibility?
+VRX-64 asks: if user input and interactivity are removed as an expectation, and
+the principles of real-time rendering from the early 2000s are adopted, is it
+possible to present more compelling, beautiful dashboards that are actually
+utilized, rather than just providing a false sense of security through
+visibility?
+
 By targeting hardware such as the **Raspberry Pi 4**
 and leveraging the capabilities of **WebGPU**, the framework enables the
 necessary infrastructure to ensure that any WebGPU-compatible
@@ -31,8 +46,8 @@ The active contract is:
 1. **The Slide (`slide.wasm`)** renders visuals and reads host-provided bytes
    through the existing `channel_poll` mailbox ABI.
 2. **The Host (`VRX-64-native`)** loads playlists and bundles, watches the
-   configured JSON files for updates, and delivers the latest valid payload to
-   the slide.
+   configured mission records for updates, and delivers the latest valid payload
+   to the slide.
 3. **The Fetcher (`brrmmmm` or another external process)** owns networking,
    retries, authentication, and persistence, then writes a durable result file
    that VRX-64 can display.
@@ -72,7 +87,7 @@ graph TD
     Kernel -->|Loads| Slide
     Slide -.->|Visual Output| Native
     Brrmmmm -->|Writes| ResultFile
-    ResultFile -->|Watched via data_path| Native
+    ResultFile -->|Resolved from mission_name| Native
     Native -->|Mailbox bytes| Slide
 ```
 
@@ -84,8 +99,8 @@ complete ecosystem:
     shader validation.
 *   **`VRX-64-native`**: A native host implementation utilizing `wgpu` and
     `winit`, enabling the engine to operate as a standalone desktop
-    application that watches slide data files and updates immediately when they
-    change.
+    application that watches mission result files and updates immediately when
+    they change.
 *   **`VRX-64-slide`**: The specification and toolset for constructing the
     visual components of a `vzglyd` bundle, including audio playback support
     for MP3, WAV, Ogg, and FLAC sound assets.
